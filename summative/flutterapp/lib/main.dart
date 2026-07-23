@@ -2,14 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-// ---------------------------------------------------------------------------
-// IMPORTANT: change this once your API is deployed on Render.
-// For now, using the Android emulator alias for localhost (10.0.2.2),
-// since 127.0.0.1 inside an emulator refers to the emulator itself, not
-// your PC. If testing on a real device, use your PC's local network IP
-// instead (e.g. http://192.168.x.x:8001).
-// ---------------------------------------------------------------------------
-const String baseUrl = "http://10.0.2.2:8001";
+const String baseUrl = "https://crop-yield-linear-regression.onrender.com";
 // const String baseUrl = "https://your-app-name.onrender.com"; // <-- switch to this after deploying
 
 void main() {
