@@ -11,9 +11,6 @@ import pandas as pd
 import joblib
 import os
 
-# ---------------------------------------------------------------------------
-# Load model artifacts once, at startup (not on every request — much faster)
-# ---------------------------------------------------------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 model = joblib.load(os.path.join(BASE_DIR, "best_model.pkl"))
@@ -25,8 +22,8 @@ NUMERIC_COLS = ["Year", "average_rain_fall_mm_per_year", "pesticides_tonnes", "a
 VALID_AREAS = sorted({col.replace("Area_", "") for col in feature_columns if col.startswith("Area_")})
 VALID_ITEMS = sorted({col.replace("Item_", "") for col in feature_columns if col.startswith("Item_")})
 
-BASELINE_AREA = "Albania"
-BASELINE_ITEM = "Cassava"
+BASELINE_AREA = "Algeria"   # alphabetically first Area (African subset), dropped during one-hot encoding
+BASELINE_ITEM = "Cassava"   # alphabetically first Item, dropped during one-hot encoding
 
 VALID_AREAS.append(BASELINE_AREA)
 VALID_ITEMS.append(BASELINE_ITEM)
@@ -38,44 +35,25 @@ app = FastAPI(
     description="Predicts crop yield (hg/ha) from country, crop type, year, rainfall, pesticide use, and temperature.",
     version="1.0.0",
 )
-
-# ---------------------------------------------------------------------------
-# CORS Middleware
-#
-# Reasoning:
-# - allow_origins: We restrict this to specific known frontends (e.g. the
-#   Flutter app / local dev server) rather than "*", since this API accepts
-#   POST requests that trigger model inference and retraining — allowing any
-#   website to freely call it is unnecessary exposure. Add your deployed
-#   Flutter web URL here if applicable.
-# - allow_methods: Only GET and POST are needed — this API doesn't support
-#   PUT/DELETE/PATCH, so we don't allow them.
-# - allow_headers: "*" is fine here since we don't rely on custom auth headers
-#   for this project; standard Content-Type headers are all that's needed.
-# - allow_credentials: False, since this API does not use cookies or
-#   session-based authentication — no credentials need to cross origins.
-# ---------------------------------------------------------------------------
 origins = [
-    "http://localhost",
+    "https://crop-yield-linear-regression.onrender.com",
     "http://localhost:3000",
     "http://localhost:8080",
-    "http://127.0.0.1",
+    "http://localhost:5000",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5000",
     "http://127.0.0.1:8000",
-    
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=False,
-    allow_methods=["GET", "POST"],
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
+    allow_credentials=True,
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-# ---------------------------------------------------------------------------
-# Request schema — enforces data types AND realistic ranges
-# ---------------------------------------------------------------------------
 class YieldPredictionRequest(BaseModel):
     area: str = Field(..., description="Country name, e.g. 'Kenya'")
     item: str = Field(..., description="Crop type, e.g. 'Maize'")
@@ -114,10 +92,6 @@ class RetrainResponse(BaseModel):
     rows_used: int
     new_r2_score: float
 
-
-# ---------------------------------------------------------------------------
-# Core prediction logic (mirrors the function built in Task 1's notebook)
-# ---------------------------------------------------------------------------
 def build_input_row(area: str, item: str, year: int, rainfall: float,
                      pesticides: float, avg_temp: float) -> pd.DataFrame:
     row = {
@@ -143,10 +117,6 @@ def build_input_row(area: str, item: str, year: int, rainfall: float,
     input_df[NUMERIC_COLS] = scaler.transform(input_df[NUMERIC_COLS])
     return input_df
 
-
-# ---------------------------------------------------------------------------
-# Routes
-# ---------------------------------------------------------------------------
 @app.get("/")
 def root():
     return {"message": "Crop Yield Prediction API is running. Visit /docs for Swagger UI."}
