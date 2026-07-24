@@ -1,17 +1,59 @@
-# flutterapp
+# Crop Yield Prediction — African Agriculture
 
-A new Flutter project.
+## Mission
+Agricultural planning across Africa is often hampered by unpredictable crop yields, making it
+hard for farmers, cooperatives, and policymakers to plan for food security. This project builds
+a machine learning model that predicts crop yield (hg/ha) for African countries based on
+rainfall, pesticide use, temperature, crop type, and year, helping stakeholders make more
+informed planting and resource-allocation decisions.
 
-## Getting Started
+## Dataset
+Source: [Crop Yield Prediction Dataset](https://www.kaggle.com/datasets/patelris/crop-yield-prediction-dataset) (Kaggle).
+The dataset was filtered to 31 African countries and 10 crop types (5,362 rows after cleaning),
+containing yield, rainfall, pesticide use, and average temperature data from 1990–2013.
 
-This project is a starting point for a Flutter application.
+## API
+- **Public API base URL:** https://crop-yield-linear-regression.onrender.com
+- **Swagger UI (interactive docs):** https://crop-yield-linear-regression.onrender.com/docs
 
-A few resources to get you started if this is your first Flutter project:
+> Note: the API is hosted on Render's free tier, which spins down after inactivity. The first
+> request after a period of inactivity may take 30-60 seconds to respond while the server wakes up.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## Project Structure
+```
+summative/
+├── linear_regression/
+│   └── multivariate.ipynb     # EDA, feature engineering, model training & comparison
+├── API/
+│   ├── prediction.py          # FastAPI app (predict + retrain endpoints)
+│   ├── requirements.txt
+│   ├── best_model.pkl
+│   ├── scaler.pkl
+│   └── feature_columns.pkl
+└── FlutterApp/                # Mobile app (single prediction screen)
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Running the Mobile App
+1. Ensure you have Flutter installed ([flutter.dev/get-started](https://flutter.dev/get-started)).
+2. Clone this repository and navigate to `summative/FlutterApp`.
+3. Install dependencies:
+   ```
+   flutter pub get
+   ```
+4. Run the app on a connected device or emulator:
+   ```
+   flutter run
+   ```
+5. The app is pre-configured to call the live API at the URL listed above — no setup needed
+   to make predictions.
+
+## Running the API Locally (optional)
+```
+cd summative/API
+pip install -r requirements.txt
+uvicorn prediction:app --reload
+```
+Then visit `http://127.0.0.1:8000/docs` for the local Swagger UI.
+
+## Video Demo
+[Link to YouTube demo video] — *(add once recorded)*

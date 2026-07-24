@@ -3,7 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 const String baseUrl = "https://crop-yield-linear-regression.onrender.com";
-// const String baseUrl = "https://your-app-name.onrender.com"; // <-- switch to this after deploying
+
+// The 31 African countries present in the training dataset.
+// Keeping this list in sync with the API's VALID_AREAS avoids
+// "not a recognized country" errors.
+const List<String> africanCountries = [
+  "Algeria", "Angola", "Botswana", "Burkina Faso", "Burundi", "Cameroon",
+  "Central African Republic", "Egypt", "Eritrea", "Ghana", "Guinea",
+  "Kenya", "Lesotho", "Libya", "Madagascar", "Malawi", "Mali",
+  "Mauritania", "Mauritius", "Morocco", "Mozambique", "Namibia",
+  "Niger", "Rwanda", "Senegal", "South Africa", "Sudan", "Tunisia",
+  "Uganda", "Zambia", "Zimbabwe",
+];
+
+// The 10 crop types present in the training dataset.
+const List<String> cropTypes = [
+  "Cassava", "Maize", "Plantains and others", "Potatoes", "Rice, paddy",
+  "Sorghum", "Soybeans", "Sweet potatoes", "Wheat", "Yams",
+];
 
 void main() {
   runApp(const CropYieldApp());
@@ -33,8 +50,9 @@ class PredictionPage extends StatefulWidget {
 }
 
 class _PredictionPageState extends State<PredictionPage> {
-  final _areaController = TextEditingController();
-  final _itemController = TextEditingController();
+  String? _selectedArea;
+  String? _selectedItem;
+
   final _yearController = TextEditingController();
   final _rainfallController = TextEditingController();
   final _pesticidesController = TextEditingController();
@@ -46,8 +64,8 @@ class _PredictionPageState extends State<PredictionPage> {
 
   Future<void> _predictYield() async {
     // Basic check: make sure nothing is empty before calling the API
-    if (_areaController.text.isEmpty ||
-        _itemController.text.isEmpty ||
+    if (_selectedArea == null ||
+        _selectedItem == null ||
         _yearController.text.isEmpty ||
         _rainfallController.text.isEmpty ||
         _pesticidesController.text.isEmpty ||
@@ -70,8 +88,8 @@ class _PredictionPageState extends State<PredictionPage> {
         Uri.parse("$baseUrl/predict"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
-          "area": _areaController.text.trim(),
-          "item": _itemController.text.trim(),
+          "area": _selectedArea,
+          "item": _selectedItem,
           "year": int.parse(_yearController.text.trim()),
           "average_rain_fall_mm_per_year": double.parse(_rainfallController.text.trim()),
           "pesticides_tonnes": double.parse(_pesticidesController.text.trim()),
@@ -107,8 +125,6 @@ class _PredictionPageState extends State<PredictionPage> {
 
   @override
   void dispose() {
-    _areaController.dispose();
-    _itemController.dispose();
     _yearController.dispose();
     _rainfallController.dispose();
     _pesticidesController.dispose();
@@ -136,10 +152,46 @@ class _PredictionPageState extends State<PredictionPage> {
               ),
               const SizedBox(height: 20),
 
-              _buildTextField(_areaController, "Country (e.g. Kenya)", isNumber: false),
+              // Country dropdown
+              DropdownButtonFormField<String>(
+                initialValue: _selectedArea,
+                decoration: const InputDecoration(
+                  labelText: "Country",
+                  border: OutlineInputBorder(),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+                items: africanCountries
+                    .map((country) => DropdownMenuItem(value: country, child: Text(country)))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedArea = value;
+                  });
+                },
+              ),
               const SizedBox(height: 12),
-              _buildTextField(_itemController, "Crop (e.g. Maize)", isNumber: false),
+
+              // Crop dropdown
+              DropdownButtonFormField<String>(
+                initialValue: _selectedItem,
+                decoration: const InputDecoration(
+                  labelText: "Crop",
+                  border: OutlineInputBorder(),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+                items: cropTypes
+                    .map((crop) => DropdownMenuItem(value: crop, child: Text(crop)))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedItem = value;
+                  });
+                },
+              ),
               const SizedBox(height: 12),
+
               _buildTextField(_yearController, "Year (e.g. 2013)", isNumber: true),
               const SizedBox(height: 12),
               _buildTextField(_rainfallController, "Average Rainfall (mm/year)", isNumber: true),
