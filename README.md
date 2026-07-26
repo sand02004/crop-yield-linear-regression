@@ -1,11 +1,11 @@
 # Crop Yield Prediction — African Agriculture
 
 ## Mission
+## Mission
 Agricultural planning across Africa is often hampered by unpredictable crop yields, making it
-hard for farmers, cooperatives, and policymakers to plan for food security. This project builds
-a machine learning model that predicts crop yield (hg/ha) for African countries based on
-rainfall, pesticide use, temperature, crop type, and year, helping stakeholders make more
-informed planting and resource-allocation decisions.
+hard for farmers and policymakers to plan for food security. This project predicts crop yield
+(hg/ha) for African countries using rainfall, pesticide use, temperature, crop type, and year,
+helping stakeholders make more informed agricultural decisions.
 
 ## Dataset
 Source: [Crop Yield Prediction Dataset](https://www.kaggle.com/datasets/patelris/crop-yield-prediction-dataset) (Kaggle).
