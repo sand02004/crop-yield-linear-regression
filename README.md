@@ -56,4 +56,4 @@ uvicorn prediction:app --reload
 Then visit `http://127.0.0.1:8000/docs` for the local Swagger UI.
 
 ## Video Demo
-[Link to YouTube demo video] — *(add once recorded)*
+(https://youtu.be/NTSNRsJXI74)
