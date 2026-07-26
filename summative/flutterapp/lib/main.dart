@@ -4,9 +4,7 @@ import 'package:http/http.dart' as http;
 
 const String baseUrl = "https://crop-yield-linear-regression.onrender.com";
 
-// The 31 African countries present in the training dataset.
-// Keeping this list in sync with the API's VALID_AREAS avoids
-// "not a recognized country" errors.
+
 const List<String> africanCountries = [
   "Algeria", "Angola", "Botswana", "Burkina Faso", "Burundi", "Cameroon",
   "Central African Republic", "Egypt", "Eritrea", "Ghana", "Guinea",
